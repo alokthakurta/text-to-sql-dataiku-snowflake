@@ -92,20 +92,23 @@ if "current_question" not in st.session_state:
 
 # 2. Add Suggested Questions
 st.write("**💡 Suggested Questions:**")
-col1, col2, col3, col4, col5, col6 = st.columns(6)
 
-# If a button is clicked, update the session state memory
-if col1.button("What is our Total Revenue?"):
+# Row 1
+row1_col1, row1_col2, row1_col3 = st.columns(3)
+if row1_col1.button("What is our Total Revenue?", use_container_width=True):
     st.session_state.current_question = "What is our Total Revenue?"
-if col2.button("How many leads converted last month?"):
+if row1_col2.button("How many leads converted last month?", use_container_width=True):
     st.session_state.current_question = "How many leads converted last month?"
-if col3.button("Who are our top 5 sales reps?"):
+if row1_col3.button("Who are our top 5 sales reps?", use_container_width=True):
     st.session_state.current_question = "Who are our top 5 sales reps?"
-if col4.button("What is the Cost Per Lead (CPL) for each campaign?"):
+
+# Row 2
+row2_col1, row2_col2, row2_col3 = st.columns(3)
+if row2_col1.button("What is the Cost Per Lead (CPL)?", use_container_width=True):
     st.session_state.current_question = "What is the Cost Per Lead (CPL) for each campaign?"
-if col5.button("Calculate Return on Marketing Investment (ROMI) by Region"):
+if row2_col2.button("Calculate ROMI by Region", use_container_width=True):
     st.session_state.current_question = "Calculate Return on Marketing Investment (ROMI) by Region"
-if col6.button("Identify Customer Acquisition Cost (CAC) for converted leads"):
+if row2_col3.button("Identify CAC for converted leads", use_container_width=True):
     st.session_state.current_question = "Identify Customer Acquisition Cost (CAC) for converted leads"
 
 st.markdown("---")
