@@ -29,31 +29,35 @@ def load_latest_ontology():
         st.error(f"Error loading ontology: {e}")
         return None
 
-# --- LLM INTEGRATION (EXTERNAL) ---
-def generate_sql(question, ontology):
-    ontology_str = json.dumps(ontology, indent=2)
-    prompt = f"""
-    You are an expert SQL assistant. 
-    Here is the current database ontology and schema rules:
-    {ontology_str}
-    
-    Based ONLY on the provided ontology, write a SQL query to answer the following question. 
-    Return ONLY the raw SQL query, no markdown, no explanations.
-    
-    Question: {question}
-    """
+
+# --- SQL EXECUTION (EXTERNAL VIA API) ---
+def execute_generated_sql(sql_query):
     try:
-        llm = project.get_llm(LLM_ID)
-        completion = llm.new_completion()
-        completion.with_message(prompt, role="user")
-        response = completion.execute()
+        # We proxy the query through Dataiku's REST API using the connection name
+        query_runner = client.sql_query(sql_query, connection=CONNECTION_NAME)
         
-        if response.success:
-            return response.text
+        # Extract schema to build pandas columns
+        schema = query_runner.get_schema()
+        
+        # FIX: Check if schema is a dictionary or directly a list
+        if isinstance(schema, dict) and 'columns' in schema:
+            columns = [col['name'] for col in schema['columns']]
         else:
-            return "Error: LLM completion failed."
+            columns = [col['name'] for col in schema]
+        
+        # Fetch the data row by row
+        data = []
+        for row in query_runner.iter_rows():
+            data.append(row)
+            
+        query_runner.verify() # Verifies stream completed successfully
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(data, columns=columns)
+        return df, None
     except Exception as e:
-        return f"Error generating SQL: {e}"
+        return None, str(e)
+
 
 # --- SQL EXECUTION (EXTERNAL VIA API) ---
 def execute_generated_sql(sql_query):
