@@ -90,12 +90,27 @@ if st.button("Generate SQL"):
             current_ontology = load_latest_ontology()
             
             if current_ontology:
-                sql_query = generate_sql(user_question, current_ontology)
+                # 1. Generate the raw response from the LLM
+                raw_llm_output = generate_sql(user_question, current_ontology)
                 
+                # 2. Clean the output to remove Markdown backticks
+                sql_query = raw_llm_output.strip()
+                if sql_query.startswith("```sql"):
+                    sql_query = sql_query[6:] # Strip the first 6 characters
+                elif sql_query.startswith("```"):
+                    sql_query = sql_query[3:] # Strip the first 3 characters
+                
+                if sql_query.endswith("```"):
+                    sql_query = sql_query[:-3] # Strip the last 3 characters
+                    
+                sql_query = sql_query.strip() # Remove any leftover whitespace/newlines
+                
+                # 3. Display the cleaned SQL
                 st.subheader("Generated SQL Query:")
                 st.code(sql_query, language="sql")
                 
-                if not sql_query.startswith("Error"):
+                # 4. Execute the cleaned SQL
+                if not raw_llm_output.startswith("Error"):
                     st.subheader("Query Results:")
                     with st.spinner("Executing query remotely..."):
                         results_df, error_msg = execute_generated_sql(sql_query)
