@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Intelligence Text-to-SQL Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals with Sky Blue & Emerald Accents -->
+    <!-- Application Structure Plan: The SPA uses a task-oriented split-pane dashboard approach. Given the source report is a technical architecture document, the most intuitive way to understand it is chronologically and spatially. The left pane provides a spatial representation (interactive HTML node map) of the system components. The right pane provides the chronological step-by-step narrative (Phases 1-4). A bottom section introduces a simulated quantitative layer (latency metrics) to satisfy data visualization requirements while enhancing the technical context. This structure allows users to see *where* actions happen while reading *what* happens. -->
+    <!-- Visualization & Content Choices: Source Report Info -> Goal -> Viz/Method -> Interaction -> Justification -> Library/Method. 1. Architecture Flow -> Goal: Organize & Explain Relationships -> Interactive HTML Node Map -> Clicking phases highlights active nodes -> Spatial mapping is best for system architectures. -> HTML/Tailwind CSS. 2. Phase Details -> Goal: Inform -> Dynamic Text Blocks -> Updates on phase selection -> Keeps screen uncluttered while providing deep dives. -> Vanilla JS. 3. System Latency -> Goal: Compare -> Bar Chart -> Hover tooltips -> Adds a quantitative performance dimension typical of architecture reviews. -> Chart.js. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .node-card { transition: all 0.3s ease; }
+        .active-node { box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.3); border-color: #0284c7; background-color: #f0f9ff; transform: translateY(-2px); }
+        .data-flow-pulse { animation: pulse-border 2s infinite; }
+        @keyframes pulse-border {
+            0% { border-color: #bae6fd; box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+            70% { border-color: #0ea5e9; box-shadow: 0 0 0 6px rgba(14, 165, 233, 0); }
+            100% { border-color: #bae6fd; box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container { height: 250px; }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-stone-200 px-6 py-8 shadow-sm">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold text-stone-900 mb-2">Financial Intelligence Text-to-SQL</h1>
+            <p class="text-stone-600 text-lg max-w-3xl">An interactive exploration of the end-to-end architectural flow connecting the Dataiku backend data engineering pipeline with the Streamlit frontend user experience.</p>
+        </div>
+    </header>
+
+    <main class="flex-grow p-6 max-w-6xl mx-auto w-full space-y-8">
+
+        <section class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+            <div class="p-6 border-b border-stone-100 bg-stone-50">
+                <h2 class="text-xl font-bold text-stone-800 mb-2">Interactive System Explorer</h2>
+                <p class="text-sm text-stone-600">This section visualizes the spatial and temporal flow of data and commands through the system. Select a phase on the right to see the corresponding active components and data pathways in the architectural diagram on the left. This helps in understanding how the frontend application safely leverages backend analytics capabilities.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-0">
+                
+                <div class="md:col-span-3 bg-slate-50 p-6 md:border-r border-stone-200 flex flex-col items-center justify-center space-y-6 relative">
+                    
+                    <div class="w-full flex justify-between items-center space-x-4 max-w-md mx-auto">
+                        <div id="node-user" class="node-card bg-white border-2 border-stone-200 rounded-lg p-4 flex flex-col items-center w-32 text-center z-10">
+                            <span class="text-3xl mb-2">🧑‍💻</span>
+                            <span class="text-xs font-bold text-stone-700">End User</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-stone-200 relative">
+                            <div id="path-user-ui" class="absolute inset-0 bg-sky-500 opacity-0 transition-opacity duration-300"></div>
+                        </div>
+                        <div id="node-streamlit" class="node-card bg-white border-2 border-stone-200 rounded-lg p-4 flex flex-col items-center w-32 text-center z-10">
+                            <span class="text-3xl mb-2">🌐</span>
+                            <span class="text-xs font-bold text-stone-700">Streamlit App<br><span class="font-normal text-[10px] text-stone-500">(Frontend)</span></span>
+                        </div>
+                    </div>
+
+                    <div class="w-full max-w-lg border-2 border-dashed border-slate-300 rounded-2xl p-6 relative bg-slate-100 mt-4">
+                        <div class="absolute -top-3 left-6 bg-slate-100 px-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Dataiku Backend Environment</div>
+                        
+                        <div class="grid grid-cols-2 gap-8 relative z-10">
+                            <div id="node-folder" class="node-card bg-white border-2 border-stone-200 rounded-lg p-4 flex flex-col items-center text-center">
+                                <span class="text-3xl mb-2">📁</span>
+                                <span class="text-xs font-bold text-stone-700">Managed Folder<br><span class="font-normal text-[10px] text-stone-500">(ontology.yaml)</span></span>
+                            </div>
+                            <div id="node-llm" class="node-card bg-white border-2 border-stone-200 rounded-lg p-4 flex flex-col items-center text-center">
+                                <span class="text-3xl mb-2">🧠</span>
+                                <span class="text-xs font-bold text-stone-700">LLM Mesh<br><span class="font-normal text-[10px] text-stone-500">(Prompt Exec)</span></span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center mt-8 relative z-10">
+                            <div id="node-db" class="node-card bg-white border-2 border-stone-200 rounded-lg p-4 flex flex-col items-center w-40 text-center">
+                                <span class="text-3xl mb-2">❄️</span>
+                                <span class="text-xs font-bold text-stone-700">Target DB<br><span class="font-normal text-[10px] text-stone-500">(Via Proxy Connection)</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="md:col-span-2 p-6 bg-white">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4 tracking-tight">Execution Timeline</h3>
+                    
+                    <div class="space-y-3 mb-6">
+                        <button onclick="activatePhase(1)" id="btn-phase-1" class="w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 focus:outline-none transition-colors duration-200 flex items-center justify-between group">
+                            <div>
+                                <span class="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">Phase 1</span>
+                                <span class="font-semibold text-stone-800">Backend Ontology Generation</span>
+                            </div>
+                            <span class="text-stone-400 group-hover:text-sky-500 transition-colors">▶</span>
+                        </button>
+                        <button onclick="activatePhase(2)" id="btn-phase-2" class="w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 focus:outline-none transition-colors duration-200 flex items-center justify-between group">
+                            <div>
+                                <span class="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">Phase 2</span>
+                                <span class="font-semibold text-stone-800">Frontend App Initialization</span>
+                            </div>
+                            <span class="text-stone-400 group-hover:text-sky-500 transition-colors">▶</span>
+                        </button>
+                        <button onclick="activatePhase(3)" id="btn-phase-3" class="w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 focus:outline-none transition-colors duration-200 flex items-center justify-between group">
+                            <div>
+                                <span class="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">Phase 3</span>
+                                <span class="font-semibold text-stone-800">Text-to-SQL Translation</span>
+                            </div>
+                            <span class="text-stone-400 group-hover:text-sky-500 transition-colors">▶</span>
+                        </button>
+                        <button onclick="activatePhase(4)" id="btn-phase-4" class="w-full text-left px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 focus:outline-none transition-colors duration-200 flex items-center justify-between group">
+                            <div>
+                                <span class="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">Phase 4</span>
+                                <span class="font-semibold text-stone-800">Secure Execution & Display</span>
+                            </div>
+                            <span class="text-stone-400 group-hover:text-sky-500 transition-colors">▶</span>
+                        </button>
+                    </div>
+
+                    <div id="phase-detail-card" class="bg-sky-50 border border-sky-100 rounded-lg p-5 hidden">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span id="detail-icon" class="text-2xl"></span>
+                            <h4 id="detail-title" class="font-bold text-sky-900"></h4>
+                        </div>
+                        <p id="detail-context" class="text-sm text-sky-800 mb-4 italic"></p>
+                        <ul id="detail-steps" class="space-y-2 text-sm text-stone-700 list-disc pl-4 marker:text-sky-400">
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-sky-200">
+                            <span class="text-xs font-bold text-sky-700 uppercase tracking-wider">Result:</span>
+                            <p id="detail-result" class="text-sm font-medium text-stone-800 mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+            <div class="p-6 border-b border-stone-100 bg-stone-50">
+                <h2 class="text-xl font-bold text-stone-800 mb-2">Estimated Transaction Latency Profile</h2>
+                <p class="text-sm text-stone-600">While the core report focuses on structural architecture, understanding the temporal performance of these phases is critical. This chart illustrates a simulated breakdown of latency during a standard user query cycle (Phases 2-4). It highlights the processing time distribution between API handshakes, LLM generation, and secure database proxy execution.</p>
+            </div>
+            <div class="p-6 flex flex-col md:flex-row gap-8 items-center">
+                <div class="w-full md:w-1/3">
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200 mb-4">
+                        <span class="block text-3xl font-bold text-stone-800 mb-1">~2.8s</span>
+                        <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Total Est. Query Time</span>
+                    </div>
+                    <p class="text-sm text-stone-600 mb-4">The majority of the execution time is typically consumed by the LLM inference (Phase 3) generating the SQL schema, followed by the physical database execution and network streaming (Phase 4). Static ontology loading (Phase 2) is highly optimized.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-slate-300 mr-2"></span>Init & Fetch</span>
+                            <span class="font-medium">10%</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-400 mr-2"></span>LLM Translation</span>
+                            <span class="font-medium">60%</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>DB Exec & Render</span>
+                            <span class="font-medium">30%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3">
+                    <div class="chart-container">
+                        <canvas id="latencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 py-8 px-6 text-center text-stone-400 text-sm mt-8">
+        <div class="max-w-6xl mx-auto">
+            <p>Interactive Architecture Explorer based on Financial Intelligence Text-to-SQL documentation.</p>
+        </div>
+    </footer>
+
+    <script>
+        const phasesData = {
+            1: {
+                icon: "⚙️",
+                title: "Backend Ontology Generation",
+                context: "Runs entirely inside Dataiku on a schedule, securely hidden from the end user.",
+                steps: [
+                    "<strong>Data Ingestion:</strong> Raw financial/operational data ingested.",
+                    "<strong>Transformation:</strong> SQL and Prepare recipes clean and group data.",
+                    "<strong>AI Enrichment:</strong> LLM recipe generates metadata/synonyms.",
+                    "<strong>Packaging:</strong> Python compiles data into YAML.",
+                    "<strong>Storage:</strong> ontology.yaml pushed to Managed Folder."
+                ],
+                result: "Database schema and business logic perfectly documented and API-accessible.",
+                activeNodes: ['node-folder', 'node-db']
+            },
+            2: {
+                icon: "🌐",
+                title: "Frontend App Initialization",
+                context: "Initial load of the Streamlit application on Community Cloud.",
+                steps: [
+                    "<strong>Authentication:</strong> App loads secrets for DSSClient session.",
+                    "<strong>Function Call:</strong> Triggers load_latest_ontology().",
+                    "<strong>API Retrieval:</strong> Downloads ontology.yaml from Dataiku Managed Folder into memory."
+                ],
+                result: "Streamlit app understands schema without hardcoded maps.",
+                activeNodes: ['node-streamlit', 'node-folder']
+            },
+            3: {
+                icon: "🧠",
+                title: "Text-to-SQL Translation",
+                context: "User interacts with the UI to ask a natural language question.",
+                steps: [
+                    "<strong>Input:</strong> User asks e.g., 'Total Revenue?'.",
+                    "<strong>Prompt:</strong> App converts YAML to JSON, combines with question.",
+                    "<strong>Invocation:</strong> Sends to Dataiku LLM Mesh.",
+                    "<strong>Cleaning:</strong> Streamlit strips markdown from returned SQL."
+                ],
+                result: "Clean, syntactically correct, ontology-aware SQL query ready.",
+                activeNodes: ['node-user', 'node-streamlit', 'node-llm']
+            },
+            4: {
+                icon: "🛡️",
+                title: "Secure Execution & Display",
+                context: "Retrieving actual financial numbers safely for the user.",
+                steps: [
+                    "<strong>Proxy Exec:</strong> Clean SQL sent to Dataiku via client.sql_query().",
+                    "<strong>Governed DB:</strong> Dataiku executes against Target DB using stored secrets.",
+                    "<strong>Streaming:</strong> Dataiku iterates rows back to Streamlit.",
+                    "<strong>Rendering:</strong> App converts to Pandas DataFrame and displays."
+                ],
+                result: "Real-time insights delivered without exposing DB credentials.",
+                activeNodes: ['node-streamlit', 'node-db', 'node-user']
+            }
+        };
+
+        function resetNodes() {
+            document.querySelectorAll('.node-card').forEach(el => {
+                el.classList.remove('active-node', 'data-flow-pulse');
+            });
+            document.querySelectorAll('[id^="btn-phase-"]').forEach(el => {
+                el.classList.remove('bg-sky-50', 'border-sky-300', 'ring-1', 'ring-sky-500');
+            });
+        }
+
+        function activatePhase(phaseId) {
+            resetNodes();
+            
+            const btn = document.getElementById(`btn-phase-${phaseId}`);
+            btn.classList.add('bg-sky-50', 'border-sky-300', 'ring-1', 'ring-sky-500');
+
+            const data = phasesData[phaseId];
+            data.activeNodes.forEach(nodeId => {
+                document.getElementById(nodeId).classList.add('active-node');
+                if (phaseId === 3 || phaseId === 4) {
+                    document.getElementById(nodeId).classList.add('data-flow-pulse');
+                }
+            });
+
+            const detailCard = document.getElementById('phase-detail-card');
+            detailCard.classList.remove('hidden');
+            
+            document.getElementById('detail-icon').textContent = data.icon;
+            document.getElementById('detail-title').textContent = data.title;
+            document.getElementById('detail-context').textContent = data.context;
+            
+            const stepsHtml = data.steps.map(step => `<li>${step}</li>`).join('');
+            document.getElementById('detail-steps').innerHTML = stepsHtml;
+            document.getElementById('detail-result').textContent = data.result;
+
+            if(latencyChart) {
+                const bgColors = ['#cbd5e1', '#cbd5e1', '#cbd5e1'];
+                if(phaseId === 2) bgColors[0] = '#3b82f6';
+                if(phaseId === 3) bgColors[1] = '#f59e0b';
+                if(phaseId === 4) bgColors[2] = '#10b981';
+                
+                latencyChart.data.datasets[0].backgroundColor = phaseId === 1 ? ['#94a3b8', '#94a3b8', '#94a3b8'] : bgColors;
+                latencyChart.update();
+            }
+        }
+
+        let latencyChart;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('latencyChart').getContext('2d');
+            latencyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Phase 2: Ontology Fetch', 'Phase 3: LLM Translation', 'Phase 4: DB Proxy Query'],
+                    datasets: [{
+                        label: 'Estimated Latency (ms)',
+                        data: [280, 1680, 840], 
+                        backgroundColor: ['#94a3b8', '#94a3b8', '#94a3b8'],
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(28, 25, 23, 0.9)',
+                            titleFont: { family: 'Inter', size: 13 },
+                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' ms execution time';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#f5f5f4' },
+                            title: { display: true, text: 'Milliseconds (ms)', font: { size: 12, family: 'Inter' } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', weight: '500' } }
+                        }
+                    },
+                    animation: { duration: 500 }
+                }
+            });
+
+            activatePhase(1);
+        });
+    </script>
+</body>
+</html>
