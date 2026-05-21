@@ -83,8 +83,8 @@ def execute_generated_sql(sql_query):
     except Exception as e:
         return None, str(e)
 # --- STREAMLIT UI ---
-st.title("External Text-to-SQL Demo 🔍")
-st.write("This demo fetches your latest `ontology.yaml` and executes queries via the Dataiku API.")
+st.title("Financial Intelligence, Unleashed.")
+st.write("Powered by Tiger’s advanced analytics to bring you institutional-grade market insights in real time.")
 
 # 1. Initialize session state to remember the question
 if "current_question" not in st.session_state:
