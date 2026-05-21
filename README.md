@@ -41,7 +41,7 @@ Before you begin, ensure you have the following:
 * **Streamlit Cloud Account:** For hosting the application.
 
 ---
-
+```
 ## 🛠️ Local Installation & Setup
 
 Follow these steps to run the application locally on your machine.
@@ -50,14 +50,14 @@ Follow these steps to run the application locally on your machine.
 ```bash
 git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
 cd your-repo-name
-
+```
 
 ### 2. Create a Virtual Environment (Recommended)
 
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-
+```
 
 ### 3. Install Dependencies
 
@@ -65,7 +65,7 @@ Ensure your `requirements.txt` includes `streamlit`, `dataiku-api-client`, `pand
 
 ```bash
 pip install -r requirements.txt
-
+```
 
 ### 4. Configure Local Secrets
 
@@ -93,7 +93,7 @@ LLM_ID = "YOUR_LLM_ID"
 
 # The exact name of the database connection in Dataiku (e.g., "Snowflake_Prod")
 CONNECTION_NAME = "YOUR_DB_CONNECTION"
-
+```
 
 ### 5. Run the Application
 
@@ -101,7 +101,7 @@ Launch the Streamlit server:
 
 ```bash
 streamlit run streamlit_git_app.py
-
+```
 
 The application will open in your default web browser at `http://localhost:8501`.
 
