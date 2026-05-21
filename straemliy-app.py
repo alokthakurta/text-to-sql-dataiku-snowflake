@@ -29,7 +29,32 @@ def load_latest_ontology():
         st.error(f"Error loading ontology: {e}")
         return None
 
-
+# --- LLM INTEGRATION (EXTERNAL) ---
+def generate_sql(question, ontology):
+    ontology_str = json.dumps(ontology, indent=2)
+    prompt = f"""
+    You are an expert SQL assistant. 
+    Here is the current database ontology and schema rules:
+    {ontology_str}
+    
+    Based ONLY on the provided ontology, write a SQL query to answer the following question. 
+    Return ONLY the raw SQL query, no markdown, no explanations.
+    
+    Question: {question}
+    """
+    try:
+        llm = project.get_llm(LLM_ID)
+        completion = llm.new_completion()
+        completion.with_message(prompt, role="user")
+        response = completion.execute()
+        
+        if response.success:
+            return response.text
+        else:
+            return "Error: LLM completion failed."
+    except Exception as e:
+        return f"Error generating SQL: {e}"
+        
 # --- SQL EXECUTION (EXTERNAL VIA API) ---
 def execute_generated_sql(sql_query):
     try:
@@ -57,31 +82,6 @@ def execute_generated_sql(sql_query):
         return df, None
     except Exception as e:
         return None, str(e)
-
-
-# --- SQL EXECUTION (EXTERNAL VIA API) ---
-def execute_generated_sql(sql_query):
-    try:
-        # We proxy the query through Dataiku's REST API using the connection name
-        query_runner = client.sql_query(sql_query, connection=CONNECTION_NAME)
-        
-        # Extract schema to build pandas columns
-        schema = query_runner.get_schema()
-        columns = [col['name'] for col in schema['columns']]
-        
-        # Fetch the data row by row
-        data = []
-        for row in query_runner.iter_rows():
-            data.append(row)
-            
-        query_runner.verify() # Verifies stream completed successfully
-        
-        # Convert to DataFrame
-        df = pd.DataFrame(data, columns=columns)
-        return df, None
-    except Exception as e:
-        return None, str(e)
-
 # --- STREAMLIT UI ---
 st.title("External Text-to-SQL Demo 🔍")
 st.write("This demo fetches your latest `ontology.yaml` and executes queries via the Dataiku API.")
