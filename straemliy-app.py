@@ -86,7 +86,35 @@ def execute_generated_sql(sql_query):
 st.title("External Text-to-SQL Demo 🔍")
 st.write("This demo fetches your latest `ontology.yaml` and executes queries via the Dataiku API.")
 
-user_question = st.text_input("Ask a question about your data:")
+# 1. Initialize session state to remember the question
+if "current_question" not in st.session_state:
+    st.session_state.current_question = ""
+
+# 2. Add Suggested Questions
+st.write("**💡 Suggested Questions:**")
+col1, col2, col3, col4, col5, col6 = st.columns(6)
+
+# If a button is clicked, update the session state memory
+if col1.button("What is our Total Revenue?"):
+    st.session_state.current_question = "What is our Total Revenue?"
+if col2.button("How many leads converted last month?"):
+    st.session_state.current_question = "How many leads converted last month?"
+if col3.button("Who are our top 5 sales reps?"):
+    st.session_state.current_question = "Who are our top 5 sales reps?"
+if col4.button("What is the Cost Per Lead (CPL) for each campaign?"):
+    st.session_state.current_question = "What is the Cost Per Lead (CPL) for each campaign?"
+if col5.button("Calculate Return on Marketing Investment (ROMI) by Region"):
+    st.session_state.current_question = "Calculate Return on Marketing Investment (ROMI) by Region"
+if col6.button("Identify Customer Acquisition Cost (CAC) for converted leads"):
+    st.session_state.current_question = "Identify Customer Acquisition Cost (CAC) for converted leads"
+
+st.markdown("---")
+
+# 3. Tie the text input directly to the session state using the 'key' parameter
+user_question = st.text_input(
+    "Ask a question about your data:", 
+    key="current_question"
+)
 
 if st.button("Generate SQL"):
     if user_question:
