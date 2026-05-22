@@ -86,6 +86,15 @@ def execute_generated_sql(sql_query):
 st.title("Financial Intelligence, Unleashed.")
 st.write("Powered by Tiger’s advanced analytics to bring you institutional-grade market insights in real time.")
 
+st.markdown("""
+    <style>
+    /* Target the text inside Streamlit buttons to make it smaller */
+    div[data-testid="stButton"] button p {
+        font-size: 10px !important; /* Change this number to make it bigger/smaller */
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # 1. Initialize session state to remember the question
 if "current_question" not in st.session_state:
     st.session_state.current_question = ""
@@ -95,20 +104,20 @@ st.write("**💡 Suggested Questions:**")
 
 # Row 1
 row1_col1, row1_col2, row1_col3 = st.columns(3)
-if row1_col1.button("What is our Total Revenue?", use_container_width=True):
+if row1_col1.button("What is our Total Revenue?"):
     st.session_state.current_question = "What is our Total Revenue?"
-if row1_col2.button("How many leads converted last month?", use_container_width=True):
+if row1_col2.button("How many leads converted last month?"):
     st.session_state.current_question = "How many leads converted last month?"
-if row1_col3.button("Who are our top 5 sales reps?", use_container_width=True):
+if row1_col3.button("Who are our top 5 sales reps?"):
     st.session_state.current_question = "Who are our top 5 sales reps?"
 
 # Row 2
 row2_col1, row2_col2, row2_col3 = st.columns(3)
-if row2_col1.button("What is the Cost Per Lead (CPL)?", use_container_width=True):
+if row2_col1.button("What is the Cost Per Lead (CPL)?"):
     st.session_state.current_question = "What is the Cost Per Lead (CPL) for each campaign?"
-if row2_col2.button("Calculate ROMI by Region", use_container_width=True):
+if row2_col2.button("Calculate ROMI by Region"):
     st.session_state.current_question = "Calculate Return on Marketing Investment (ROMI) by Region"
-if row2_col3.button("Identify CAC for converted leads", use_container_width=True):
+if row2_col3.button("Identify CAC for converted leads"):
     st.session_state.current_question = "Identify Customer Acquisition Cost (CAC) for converted leads"
 
 st.markdown("---")
